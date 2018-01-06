@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Quick Share</string>
+
+    <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
+
+    <string name="unknown_response">Unexpected response code</string>
+    <string name="sign_in_successful">Sign in successful</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">An unknown error occurred</string>
 </resources>
