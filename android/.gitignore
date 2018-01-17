@@ -3,7 +3,11 @@
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
+<<<<<<< HEAD
+./app/google-services.json
+=======
 /app/google-services.json
+>>>>>>> 297c98947ccd2ddd82ddcf3a8af3e7342cffa7f0
 .DS_Store
 /build
 /captures

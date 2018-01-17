@@ -1,4 +1,4 @@
-package com.gdgnitsurat.quickshare
+package com.gdgnitsurat.quickshare.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,7 +7,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.firebase.ui.auth.AuthUI
+import com.gdgnitsurat.quickshare.R
+import com.gdgnitsurat.quickshare.service
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -24,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         signInButton.setOnClickListener { invalidateSignIn() }
+        Log.e("sdvsdbv", "Start Service")
+        startService(Intent(this, service::class.java))
+
     }
 
     private fun invalidateSignIn() {
@@ -61,12 +65,14 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.menu_item_sign_out -> {
                 if (isUserSignedIn()) {
-                    AuthUI.getInstance()
-                            .signOut(this)
-                            .addOnCompleteListener {
-                                Log.e("Auth : ", "Sign out successful")
-                                updateUI()
-                            }
+//                    AuthUI.getInstance()
+//                            .signOut(this)
+//                            .addOnCompleteListener {
+//                                Log.e("Auth : ", "Sign out successful")
+//                                updateUI()
+//                            }
+                    Log.e("sdvsdbv", "Stopping Service")
+                    stopService(Intent(this, service::class.java))
                 }
             }
         }
