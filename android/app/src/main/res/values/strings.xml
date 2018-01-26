@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Quick Share</string>
 
+    <string name="sign_in_to_get_started">Sign in to get started</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
 
@@ -9,4 +10,6 @@
     <string name="sign_in_cancelled">Sign in cancelled</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="unknown_error">An unknown error occurred</string>
+
+    <string name="enable_service">Enable Service</string>
 </resources>

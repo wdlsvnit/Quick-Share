@@ -1,5 +1,7 @@
-package com.gdgnitsurat.quickshare.activity
+package com.gdgnitsurat.quickshare.activities
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -7,11 +9,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.firebase.ui.auth.AuthUI
 import com.gdgnitsurat.quickshare.R
-import com.gdgnitsurat.quickshare.service
+import com.gdgnitsurat.quickshare.clipboard.ClipboardService
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,9 +27,32 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         signInButton.setOnClickListener { invalidateSignIn() }
-        Log.e("sdvsdbv", "Start Service")
-        startService(Intent(this, service::class.java))
 
+        serviceSwitch.isChecked = isClipBoardServiceRunning(ClipboardService::class.java)
+        serviceSwitch.setOnCheckedChangeListener({ _, isChecked ->
+            run {
+                if (isChecked) {
+                    startClipboardService()
+                } else {
+                    stopClipboardService()
+                }
+            }
+        })
+    }
+
+    private fun startClipboardService() {
+        startService(Intent(application, ClipboardService::class.java))
+        Log.e("ClipboardService", "Clipboard Service started")
+    }
+
+    private fun stopClipboardService() {
+        stopService(Intent(application, ClipboardService::class.java))
+        Log.e("ClipboardService", "Clipboard Service stopped")
+    }
+
+    private fun isClipBoardServiceRunning(serviceClass: Class<ClipboardService>): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        return activityManager.getRunningServices(Integer.MAX_VALUE).any { serviceClass.name == it.service.className }
     }
 
     private fun invalidateSignIn() {
@@ -44,15 +69,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI() {
         if (!isUserSignedIn()) {
             signInButton.visibility = View.VISIBLE
+            serviceSwitch.visibility = View.INVISIBLE
             menu?.findItem(R.id.menu_item_sign_out)?.isVisible = false
-            textView.text = "Sign in to get started"
+            textView.text = getString(R.string.sign_in_to_get_started)
         } else {
             signInButton.visibility = View.INVISIBLE
+            serviceSwitch.visibility = View.VISIBLE
             menu?.findItem(R.id.menu_item_sign_out)?.isVisible = true
             textView.text = firebaseAuth.currentUser?.email
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         this.menu = menu
@@ -65,18 +91,16 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.menu_item_sign_out -> {
                 if (isUserSignedIn()) {
-//                    AuthUI.getInstance()
-//                            .signOut(this)
-//                            .addOnCompleteListener {
-//                                Log.e("Auth : ", "Sign out successful")
-//                                updateUI()
-//                            }
-                    Log.e("sdvsdbv", "Stopping Service")
-                    stopService(Intent(this, service::class.java))
+                    AuthUI.getInstance()
+                            .signOut(this)
+                            .addOnCompleteListener {
+                                Log.e("Auth : ", "Sign out successful")
+                                updateUI()
+                            }
+                    stopClipboardService()
                 }
             }
         }
-
         return false
     }
 }

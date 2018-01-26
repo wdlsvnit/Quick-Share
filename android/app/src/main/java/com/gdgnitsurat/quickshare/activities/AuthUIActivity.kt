@@ -1,30 +1,24 @@
-package com.gdgnitsurat.quickshare.activity
+package com.gdgnitsurat.quickshare.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.gdgnitsurat.quickshare.R
-import com.gdgnitsurat.quickshare.model.user
+import com.gdgnitsurat.quickshare.model.User
+import com.gdgnitsurat.quickshare.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import java.net.NetworkInterface
 import java.util.*
 
 
 class AuthUIActivity : AppCompatActivity() {
-
-    private val RC_SIGN_IN = 123
 
     private lateinit var firebaseAuth: FirebaseAuth
     private var firebaseUser: FirebaseUser? = null
@@ -42,10 +36,6 @@ class AuthUIActivity : AppCompatActivity() {
         }
 
         signIn()
-
-//        Log.e("MAC ADDRESS  ",getMACAddress("wlan0"))
-//        Log.e("MAC ADDRESS 1 ",getMACAddress("eth0"))
-//        Log.e("MAC ADDRESS 2 ",get())
     }
 
     private fun signIn() {
@@ -56,12 +46,12 @@ class AuthUIActivity : AppCompatActivity() {
 
         startActivityForResult(
                 AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
-                , RC_SIGN_IN
+                , Constants.REQUEST_CODE_SIGN_IN
         )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == Constants.REQUEST_CODE_SIGN_IN) {
             val response = IdpResponse.fromResultIntent(data)
 
             if (resultCode == Activity.RESULT_OK) {
@@ -98,36 +88,7 @@ class AuthUIActivity : AppCompatActivity() {
 
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val databaseRef: DatabaseReference = database.reference
-        val user = user(firebaseAuth.currentUser?.displayName, firebaseAuth.currentUser?.email)
+        val user = User(firebaseAuth.currentUser?.displayName, firebaseAuth.currentUser?.email)
         databaseRef.child("users").child(firebaseAuth.currentUser?.uid).setValue(user)
     }
-
-//    private fun getMACAddress(interfaceName :String):String{
-//        val interfaces = Collections.list(NetworkInterface.getNetworkInterfaces())
-//        for (intf : NetworkInterface in interfaces){
-//            if (interfaceName != null){
-//                if (intf.name.equals(interfaceName,true)) continue
-//            }
-//            var mac = intf.hardwareAddress;
-//            if (mac==null) return ""
-//            var buf = StringBuilder()
-//            for (i in mac.indices){
-//                buf.append(String.format("%02X:",mac[i]))
-//            }
-//            if (buf.length>0){
-//                buf.deleteCharAt(buf.length-1)
-//            }
-//            return buf.toString()
-//        }
-//        return ""
-//    }
-
-
-//    @SuppressLint("WifiManagerLeak")
-//    private fun get():String{
-//        val wifimanager :WifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
-//        val wifiInfo = wifimanager.connectionInfo
-//        return wifiInfo.macAddress
-//    }
-
 }
