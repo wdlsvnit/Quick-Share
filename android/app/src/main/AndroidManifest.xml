@@ -21,8 +21,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.AuthUIActivity" />
-
         <service android:name=".clipboard.ClipboardService" />
     </application>
 
