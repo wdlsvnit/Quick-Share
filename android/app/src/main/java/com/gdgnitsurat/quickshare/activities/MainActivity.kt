@@ -1,8 +1,10 @@
 package com.gdgnitsurat.quickshare.activities
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -15,6 +17,7 @@ import com.gdgnitsurat.quickshare.fragments.DevicesFragment
 import com.gdgnitsurat.quickshare.fragments.HomeFragment
 import com.gdgnitsurat.quickshare.utils.Constants
 import com.gdgnitsurat.quickshare.utils.FirebaseUtil
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private var itemDevices: PrimaryDrawerItem? = null
     private var itemSettings: PrimaryDrawerItem? = null
     private var currentProfile: PrimaryDrawerItem? = null
+    private var androidID = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,10 @@ class MainActivity : AppCompatActivity() {
         instantiateMenuItems()
         setupProfileDrawer()
         setupNavigationDrawerWithHeader()
+        getAndroidId()
+    }
+    private fun getAndroidId(){
+        androidID = Settings.Secure.getString(contentResolver,Settings.Secure.ANDROID_ID)
     }
 
     private fun setupToolbar() {
@@ -171,12 +179,12 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == Constants.REQUEST_CODE_SIGN_IN) {
             val response = IdpResponse.fromResultIntent(data)
-
             if (resultCode == Activity.RESULT_OK) {
                 //Successfully signed in
                 Toast.makeText(this, R.string.sign_in_success, Toast.LENGTH_LONG).show()
                 updateUIAfterSignIn()
                 FirebaseUtil.addCurrentUserToFirebaseDatabase()
+                FirebaseUtil.addDeviceToFirebaseDatabase(androidID)
                 return
             } else {
                 //User pressed back button
@@ -198,6 +206,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
             }
+
         }
     }
 
