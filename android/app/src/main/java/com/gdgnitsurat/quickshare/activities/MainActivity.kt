@@ -1,8 +1,9 @@
 package com.gdgnitsurat.quickshare.activities
 
 import android.app.Activity
-import android.app.Application
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v4.app.Fragment
@@ -17,7 +18,6 @@ import com.gdgnitsurat.quickshare.fragments.DevicesFragment
 import com.gdgnitsurat.quickshare.fragments.HomeFragment
 import com.gdgnitsurat.quickshare.utils.Constants
 import com.gdgnitsurat.quickshare.utils.FirebaseUtil
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -55,10 +55,15 @@ class MainActivity : AppCompatActivity() {
         instantiateMenuItems()
         setupProfileDrawer()
         setupNavigationDrawerWithHeader()
-        getAndroidId()
+        saveDeviceID()
     }
-    private fun getAndroidId(){
-        androidID = Settings.Secure.getString(contentResolver,Settings.Secure.ANDROID_ID)
+
+    fun saveDeviceID() {
+        androidID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        val sharedPreference: SharedPreferences = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreference.edit()
+        editor.putString(Constants.DEVICE_PREF, androidID)
+        editor.apply()
     }
 
     private fun setupToolbar() {
@@ -184,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.sign_in_success, Toast.LENGTH_LONG).show()
                 updateUIAfterSignIn()
                 FirebaseUtil.addCurrentUserToFirebaseDatabase()
-                FirebaseUtil.addDeviceToFirebaseDatabase(androidID)
+                FirebaseUtil.addDeviceToFirebaseDatabase()
                 return
             } else {
                 //User pressed back button

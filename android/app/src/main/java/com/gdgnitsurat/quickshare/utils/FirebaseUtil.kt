@@ -1,8 +1,7 @@
 package com.gdgnitsurat.quickshare.utils
 
-import android.provider.Settings
-import android.util.Log
-import com.gdgnitsurat.quickshare.activities.MainActivity
+import android.content.Context
+import com.gdgnitsurat.quickshare.App
 import com.gdgnitsurat.quickshare.model.Clip
 import com.gdgnitsurat.quickshare.model.Device
 import com.gdgnitsurat.quickshare.model.User
@@ -16,8 +15,11 @@ object FirebaseUtil {
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private var firebaseUser: FirebaseUser? = firebaseAuth.currentUser
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private var deviceid = ""
+    private var deviceID = ""
 
+    init {
+        getDeviceID()
+    }
 
     fun addCurrentUserToFirebaseDatabase() {
         val databaseRef: DatabaseReference = database.getReference("users")
@@ -25,27 +27,24 @@ object FirebaseUtil {
         databaseRef.child(firebaseAuth.currentUser?.uid).setValue(user)
     }
 
-    fun addDeviceToFirebaseDatabase(deviceID:String) {
-        deviceid = deviceID
+    fun addDeviceToFirebaseDatabase() {
         val databaseRef: DatabaseReference = database.reference
         val device = Device("android", firebaseAuth.currentUser?.uid)
         databaseRef.child("devices").child(deviceID).setValue(device)
         databaseRef.child("users").child(firebaseAuth.currentUser?.uid).child("devices").setValue(deviceID)
     }
 
-    fun addClipToFirebaseDatabase(clip:String,time:String) {
-        val id = deviceid
-        val databaseRef1: DatabaseReference = database.getReference("devices").child(id).child("clips")
+    fun addClipToFirebaseDatabase(s: String, time: String) {
+        val databaseRef1: DatabaseReference = database.getReference("devices").child(deviceID).child("clips")
         val databaseRef: DatabaseReference = database.getReference("clips").push()
-        val clip = Clip(clip,time, firebaseAuth.currentUser?.uid, deviceid)
+        val clip = Clip(s, time, firebaseAuth.currentUser?.uid, deviceID)
         var key = databaseRef.key
         databaseRef.setValue(clip)
         databaseRef1.child(key).setValue(true)
     }
 
-    fun isUserSignedIn(): Boolean {
-        firebaseUser = firebaseAuth.currentUser
-        return firebaseUser != null
+    fun getDeviceID() {
+        val sharedPreference = App.applicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+        deviceID = sharedPreference.getString(Constants.DEVICE_PREF, "")
     }
-
 }

@@ -9,9 +9,9 @@ object Constants {
     //Sign in constants
     const val REQUEST_CODE_SIGN_IN = 123
 
-    //SharedPreference constants
+    //MySharedPreference constants
     const val PREF_NAME = "QUICKSHARE"
-    const val PRIVATE_MODE = 0
+    const val DEVICE_PREF = "deviceID"
 
     //Drawer menu constants
     const val ITEM_VERIFIED_PROFILE = 1
